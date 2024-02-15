@@ -1,58 +1,54 @@
 import * as vscode from 'vscode';
+import OpenAI from "openai";
 
-import bmi from './resources/BMI.txt';
-import deviation from './resources/AverageStandardDeviation.txt';
-import minmax from './resources/MinMax.txt';
-import multiples from './resources/Multiples.txt';
-import coin from './resources/TossCoin.txt';
-import area from './resources/TriangleArea.txt';
-import vert from './resources/Vertebrates.txt';
-
-/**
- * Cache results to avoid VSCode keep refetching
- */
+const key = "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";
 const cachedResults: { [keyword: string]: string } = {};
+const openai = new OpenAI({apiKey: key});
 
 export async function search(keyword: string): Promise<null |  string > {
-
-
     if (keyword in cachedResults) {
         return Promise.resolve(cachedResults[keyword]);
     }
 
-    // eslint-disable-next-line no-async-promise-executor
-    const promise = new Promise<string>((resolve, reject) => {
-    console.log('Searching:', keyword);
-    let results = "";
-    const solutions: { [key: string]: string } = { bmi, deviation, minmax, multiples, coin, area, vert };
+    console.log("Keyword: ", keyword);
 
-    try {
-        Object.keys(solutions).forEach(key => {
-            if((keyword).includes(key)) {
-                results = solutions[key];
-                return;
+    // eslint-disable-next-line no-async-promise-executor
+    const promise = new Promise<string>(async (resolve, reject) => {
+
+        vscode.window.showInformationMessage(`CommandPilot: Searching for results`);
+        let results = "";
+
+        try {
+            const completion = await openai.chat.completions.create({
+                messages: [{ role: "system", content: keyword }],
+                model: "gpt-3.5-turbo",
+            });
+
+            console.log(completion.choices[0]);
+            results = completion.choices[0].message.content ?? "";
+            resolve(results);
+        } catch (error) {
+            console.error('Error getting results:', error);
+            reject(error);
+        }
+
+        console.log();
+
+        promise.then((results) => {
+            vscode.window.showInformationMessage(`CommandPilot: Finished loading results`);
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                const position = editor.selection.active;
+                editor.edit(editBuilder => {
+                    editBuilder.insert(position, '\n');
+                }).then(() => {
+                    vscode.commands.executeCommand('cursorMove', { to: 'down', by: 'line', value: 1});
+                });
             }
         });
-        resolve(results);
-    } catch (error) {
-        console.error('Error reading directory:', error);
-        reject(error);
-    }
-    });
-
-    promise.then((results) => {
+        // When promise resolved, show finished loading for 5 seconds
         vscode.window.showInformationMessage(`CommandPilot: Finished loading results`);
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-            const position = editor.selection.active;
-            editor.edit(editBuilder => {
-                editBuilder.insert(position, '\n');
-            }).then(() => {
-                vscode.commands.executeCommand('cursorMove', { to: 'down', by: 'line', value: 1});
-            });
-        }
     });
-
     return promise;
 }
 
