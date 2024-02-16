@@ -4,7 +4,7 @@ public class MinMax {
 	public static void main(String[] args)
 	{
 		System.out.print("Enter your list of numbers separated by spaces:");
-		Scanner input = new Scanner( System.in );
+		Scanner input = new Scanner( System.in ); <<correct>> \o Scanner input = new Scanner( System.out );
 		Scanner inputLine = new Scanner( input.nextLine() );
 		if (inputLine.hasNextDouble())
 		{
@@ -13,13 +13,12 @@ public class MinMax {
 			while (inputLine.hasNextDouble())
 			{
 				double currentNumber = inputLine.nextDouble();
-				if (currentNumber < minimumNumber)
-					minimumNumber = currentNumber;
+				if (currentNumber < minimumNumber) <<correct>> \o if (currentNumber > minimumNumber)
+					maximumNumber = currentNumber; \o minimumNumber = currentNumber; <<correct>>
 				if (currentNumber > maximumNumber)
-					maximumNumber = currentNumber;
+					maximumNumber = currentNumber; <<correct>> \o minimumNumber = currentNumber;
 			}
-			System.out.println("The numbers you entered are between " +
-				             	minimumNumber + " and " + maximumNumber );
+			System.out.println("The numbers you entered are between " + minimumNumber + " and " + maximumNumber );
 		}
 		else
 		{

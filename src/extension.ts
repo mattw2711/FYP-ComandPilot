@@ -55,25 +55,27 @@ export async function activate(_: vscode.ExtensionContext) {
             
             let items: (vscode.CompletionItem | undefined)[] = [];
 
-            if (matched && solution) {
-                try {
-                    if (solution && document.lineAt(position.line).text.trim() === '') {
-                        const suggestions = getSuggestions(solution.split('\n')[position.line]);
-                        items = suggestions.map((item: any) => {
-                            const completionItem = new vscode.CompletionItem(item, 0);
-                            completionItem.insertText = item.replace(/\t/g, '    ') + (document.lineCount === position.line + 1 ? '\n' : '');
-                            completionItem.range = new vscode.Range(position.translate(0, item.length), position);
-                            completionItem.keepWhitespace = true;
-                            //console.log(completionItem);
-                            if (suggestions.length > 1) {
-                                completionItem.command = { command: 'extension.onCompletionItemSelected', title: '', arguments: [completionItem] };
-                            }
-                            //console.log(chosenOptions);
-                            return completionItem;                                                                      
-                        });
+            if(solution.split('\n').length > position.line){
+                if (matched && solution) {
+                    try {
+                        if (solution && document.lineAt(position.line).text.trim() === '') {
+                            const suggestions = getSuggestions(solution.split('\n')[position.line]);
+                            items = suggestions.map((item: any) => {
+                                const completionItem = new vscode.CompletionItem(item, 0);
+                                completionItem.insertText = item.replace(/\t/g, '    ') + (document.lineCount === position.line + 1 ? '\n' : '');
+                                completionItem.range = new vscode.Range(position.translate(0, item.length), position);
+                                completionItem.keepWhitespace = true;
+                                //console.log(completionItem);
+                                if (suggestions.length > 1) {
+                                    completionItem.command = { command: 'extension.onCompletionItemSelected', title: '', arguments: [completionItem] };
+                                }
+                                //console.log(chosenOptions);
+                                return completionItem;                                                                      
+                            });
+                        }
+                    } catch (err: any) {
+                        vscode.window.showErrorMessage(err.toString());
                     }
-                } catch (err: any) {
-                    vscode.window.showErrorMessage(err.toString());
                 }
             }
             return {items};
@@ -135,7 +137,7 @@ function getSuggestions(text: string): string[] {
         const leadingWhitespace = result[0].match(/^\s*/)?.[0];
         result = result.map(item => (leadingWhitespace + item.replace("<<correct>>", "").trim() + " //option line"));
     }
-    return result; // Return the original text if no newline character is found
+    return result;
 }
 
 

@@ -67,7 +67,9 @@ export async function search(keyword: string): Promise<string > {
                 await openai.beta.threads.del(thread.id);
 
                 //console.log("Results:", results);
-                resolve(results);
+                results = results.replace("```java", "");
+                results = results.replace("```", "");
+                resolve(results.trim());
             } catch (error) {
                 console.error('Error getting results:', error);
                 reject(error);

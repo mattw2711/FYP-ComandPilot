@@ -10,8 +10,8 @@ public class TriangleArea {
 		double x3 = inputScanner.nextDouble();
 		double y3 = inputScanner.nextDouble();
 		inputScanner.close();
-		double area = Math.abs( (x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2)) / 2.0 );
-		System.out.printf( "The area of triangle ((%.1f, %.1f), (%.1f, %.1f), (%.1f, %.1f)) is %.2f", x1, y1, x2, y2, x3, y3, area);
+		double area = Math.abs( (x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2)) / 2.0 ); <<correct>> \o double area = Math.abs( (x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2)) / 3.0 ); \o double area = Math.abs( (x1/(y2-y3) + x2/(y3-y1) + x3/(y1-y2)) / 2.0 );
+		System.out.print( "The area of triangle ((%.1f, %.1f), (%.1f, %.1f), (%.1f, %.1f)) is %.2f", x1, y1, x2, y2, x3, y3, area); \o System.out.printf( "The area of triangle ((%.1f, %.1f), (%.1f, %.1f), (%.1f, %.1f)) is %.2f", x1, y1, x2, y2, x3, y3, area); <<correct>>
 	}
 }
  

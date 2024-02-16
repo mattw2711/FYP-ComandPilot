@@ -5,12 +5,12 @@ public class Vertebrates {
 		System.out.print("Is the animal cold blooded (Yes/No)? ");
 		String coldBloodedAnswer = input.next();
 		boolean coldBlooded = coldBloodedAnswer.equalsIgnoreCase("Yes");
-		if (!coldBlooded)
+		if (!coldBlooded) <<correct>> \o if (coldBlooded)
 		{
 			System.out.print("Does the animal have wings and feathers (Yes/No)? ");
 			String hasWingsAnswer = input.next();
 			boolean hasWings = hasWingsAnswer.equalsIgnoreCase("Yes");
-			if (hasWings)
+			if (!hasWings) \o if (hasWings) <<correct>> 
 				System.out.println("The animal is a bird.");
 			else System.out.println("The animal is a mammal.");
 		}
@@ -19,12 +19,12 @@ public class Vertebrates {
 			System.out.print("Does the animal have scales (Yes/No)? ");
 			String hasScalesAnswer = input.next();
 			boolean hasScales = hasScalesAnswer.equalsIgnoreCase("Yes");
-			if (hasScales)
+			if (hasScales) <<correct>> \o if (hasWings)
 			{
-					System.out.print("Does the animal have any fins (Yes/No)? ");
+				System.out.print("Does the animal have any fins (Yes/No)? ");
 				String hasFinsAnswer = input.next();
 				boolean hasFins = hasFinsAnswer.equalsIgnoreCase("Yes");
-				if (hasFins)
+				if (hasFins) <<correct>> \o if (!hasFins)
 					System.out.println("The animal is a fish.");
 				else System.out.println("The animal is a reptile.");
 			}
