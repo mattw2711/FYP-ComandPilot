@@ -9,6 +9,12 @@ let solution: string| null;
 let original: string;
 let match: any = undefined;
 let chosenOptions: string[] = [];
+const wrongAnswerDecorationType = vscode.window.createTextEditorDecorationType({
+    backgroundColor: 'rgba(255, 0, 0, 0.5)'
+});
+const rightAnswerDecorationType = vscode.window.createTextEditorDecorationType({
+    backgroundColor: 'rgba(0, 255, 0, 0.5)'
+});
 
 export function activate(_: vscode.ExtensionContext) {
 
@@ -118,6 +124,35 @@ export function activate(_: vscode.ExtensionContext) {
                 vscode.window.showInformationMessage('You chose the correct combination of options!');
             } else {
                 vscode.window.showInformationMessage('You did not choose the correct combination of options.');
+
+                const editor = vscode.window.activeTextEditor;
+                if (editor) {
+                    const document = editor.document;
+                    const errors = [];
+                    const valid = [];
+                    for (let i = 0; i < sortedChosenOptions.length; i++) {
+                        if (sortedChosenOptions[i] !== sortedCorrectSolution[i]) {
+                            for (let line = 0; line < document.lineCount; line++) {
+                                if (document.lineAt(line).text.includes(sortedChosenOptions[i])) {
+                                    const range = new vscode.Range(line, 0, line, editor.document.lineAt(line).text.length);
+                                    errors.push({ range });
+                                    break;
+                                }
+                            }
+                        }
+                        else if (sortedChosenOptions[i] === sortedCorrectSolution[i]) {
+                            for (let line = 0; line < document.lineCount; line++) {
+                                if (document.lineAt(line).text.includes(sortedChosenOptions[i])) {
+                                    const range = new vscode.Range(line, 0, line, editor.document.lineAt(line).text.length);
+                                    valid.push({ range });
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    editor.setDecorations(wrongAnswerDecorationType, errors);
+                    editor.setDecorations(rightAnswerDecorationType, valid);
+                }
             }
         }
     });
@@ -145,6 +180,8 @@ function getSuggestions(text: string): string[] {
 function handleDocumentChange(document: vscode.TextDocument) {
     const editor = vscode.window.activeTextEditor;
     if(editor) {
+        editor.setDecorations(wrongAnswerDecorationType, []);
+        editor.setDecorations(rightAnswerDecorationType, []);
         const line = editor.document.lineAt(editor.selection.active.line);
         if(editor.selection.active.line === 0 && matched && line.text === '') {
             reset();
