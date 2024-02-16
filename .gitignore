@@ -15,3 +15,4 @@ yarn-error.log
 vscode.d.ts
 /out
 .env
+src/utils/apiKey.ts
