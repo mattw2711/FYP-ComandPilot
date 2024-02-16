@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 const CSConfig = {
-    SEARCH_PATTERN: /(\/\/|#|--|<!--)\s?solve\s?(.+)\s?(\.|-->)/
+    SEARCH_PATTERN: /(\/\/|#|--|<!--)\s?\s?(.+)\s?(\.|-->)/
 };
 
 type IConfig = {

@@ -1,22 +1,22 @@
 import * as vscode from 'vscode';
 
-import { search } from './utils/search';
+import { createBot, search } from './utils/search';
 import { matchSearchPhrase } from './utils/matchSearchPhrase';
 
 let matched = false;
-let accepted = false;
-let solution: string| null;
+let solution: string;
 let original: string;
-let match: any = undefined;
 let chosenOptions: string[] = [];
 
-export function activate(_: vscode.ExtensionContext) {
+export async function activate(_: vscode.ExtensionContext) {
 
     vscode.window.showInformationMessage(`CommandPilot Enabled`);
 
     vscode.commands.registerCommand('extension.onCompletionItemSelected', (item: vscode.CompletionItem) => {
         chosenOptions.push(item.label.replace("//option line", "").trim());
     });
+
+    await createBot();
 
     const activeTextEditor = vscode.window.activeTextEditor;
     if (activeTextEditor) {
@@ -42,17 +42,15 @@ export function activate(_: vscode.ExtensionContext) {
             );
 
             //Uses that as search query - Change it so if match, gets the next line?
-            if(!matched) {
-                match = matchSearchPhrase(textBeforeCursor);
-                //console.log('Matched:', match);
-                solution = await search(match.searchPhrase);
-                original = solution ?? '';
-                //console.log('Solution:', solution);
-            }
-            
-            if(match && !matched) {
-                matched = true;
-                solution = "\n" + solution;
+            if (!matched) {
+                const match = matchSearchPhrase(textBeforeCursor);
+                if(match !== ""){
+                    //Add new line so lines match with editor line #
+                    solution = "\n" + await search(match);
+                    original = solution;
+                    matched = true;
+                    console.log('Solution:', solution);
+                }
             }
             
             let items: (vscode.CompletionItem | undefined)[] = [];
@@ -62,18 +60,16 @@ export function activate(_: vscode.ExtensionContext) {
                     if (solution && document.lineAt(position.line).text.trim() === '') {
                         const suggestions = getSuggestions(solution.split('\n')[position.line]);
                         items = suggestions.map((item: any) => {
-                            if (item.trim() != "") {
-                                const completionItem = new vscode.CompletionItem(item, 0);
-                                completionItem.insertText = item.replace(/\t/g, '    ') + (document.lineCount === position.line + 1 ? '\n' : '');
-                                completionItem.range = new vscode.Range(position.translate(0, item.length), position);
-                                completionItem.keepWhitespace = true;
-                                //console.log(completionItem);
-                                if (suggestions.length > 1) {
-                                    completionItem.command = { command: 'extension.onCompletionItemSelected', title: '', arguments: [completionItem] };
-                                }
-                                //console.log(chosenOptions);
-                                return completionItem;  
-                            }                                                                      
+                            const completionItem = new vscode.CompletionItem(item, 0);
+                            completionItem.insertText = item.replace(/\t/g, '    ') + (document.lineCount === position.line + 1 ? '\n' : '');
+                            completionItem.range = new vscode.Range(position.translate(0, item.length), position);
+                            completionItem.keepWhitespace = true;
+                            //console.log(completionItem);
+                            if (suggestions.length > 1) {
+                                completionItem.command = { command: 'extension.onCompletionItemSelected', title: '', arguments: [completionItem] };
+                            }
+                            //console.log(chosenOptions);
+                            return completionItem;                                                                      
                         });
                     }
                 } catch (err: any) {
@@ -100,12 +96,14 @@ export function activate(_: vscode.ExtensionContext) {
                     const deletedLineText = e.document.lineAt(line).text.trim();
                     const edit = new vscode.WorkspaceEdit();
                     edit.delete(e.document.uri, wholeLineRange);
-                    console.log("Deleted; ", deletedLineText);
+                    console.log("Deleted: ", deletedLineText);
                     const index = chosenOptions.indexOf(deletedLineText.replace("//option lin", "").trim());
                     if (index !== -1) {
                         chosenOptions.splice(index, 1);
                     }
                     vscode.workspace.applyEdit(edit);
+                    if(editor?.selection.active.line === 0)
+                        reset();
                 }
             }
         }
@@ -130,14 +128,6 @@ export function activate(_: vscode.ExtensionContext) {
     });
 }
 
-function removeFirstLine(text: string): string {
-    const newlineIndex = text.indexOf('\n');
-    if (newlineIndex !== -1) { // Check if newline character exists
-        return text.substring(newlineIndex + 1);
-    }
-    return text; // Return the original text if no newline character is found
-}
-
 function getSuggestions(text: string): string[] {
     let result = [text];
     if(text.includes("\\o")){
@@ -159,12 +149,11 @@ function handleDocumentChange(document: vscode.TextDocument) {
 
 function reset() {
     matched = false;
-    accepted = false;
-    solution = null;
-    match  = undefined;
+    solution = "";
     original = "";
     chosenOptions = [];
     clearEditor();
+    vscode.window.showInformationMessage(`CommandPilot: Reset Editor`);
 }
 
 function clearEditor() {

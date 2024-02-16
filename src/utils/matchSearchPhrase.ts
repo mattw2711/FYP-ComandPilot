@@ -1,41 +1,20 @@
 import CSConfig from "../config";
 import { window } from "vscode";
 
-
-type SearchMatchResult = {
-    commentSyntax: string,
-    commentSyntaxEnd: string,
-    searchPhrase: string,
-    fileType: string
-}
-
 /**
  * Match the giving string with search pattern
  * @param {string} input
- * @returns {SearchMatchResult | undefined} if found, return the search phrase, comment's opening and closing syntax
+ * @returns {SearchMatchResult} if found, return the search phrase, comment's opening and closing syntax
  */
-export function matchSearchPhrase(input: string): SearchMatchResult | undefined {
+export function matchSearchPhrase(input: string): string {
     const match = CSConfig.SEARCH_PATTERN.exec(input);
 
+    //console.log("Match:", match);
+
     if (match && match.length > 2) {
-
-        const [_, commentSyntax, searchPhrase, commentSyntaxEnd] = match;
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        let fileType = window.activeTextEditor.document.languageId;
-
-        if (fileType === "plaintext") {
-            fileType = "";
-        }
-        
-        return {
-            commentSyntax,
-            commentSyntaxEnd,
-            searchPhrase: `${searchPhrase}`,
-            fileType
-        };
+        const [_, commentSyntax, searchPhrase, commentSyntaxEnd] = match;        
+        return `${searchPhrase}`;
     }
 
-    return undefined;
+    return "";
 }
