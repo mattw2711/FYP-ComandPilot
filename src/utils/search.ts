@@ -8,7 +8,7 @@ let assistant: OpenAI.Beta.Assistants.Assistant | null = null;
 
 export async function createBot() {
     assistant = await openai.beta.assistants.retrieve(
-        "asst_M8LhgFGO45Nx5UOp3brLbBzh"
+        "asst_bHUDDDCfHIIP2rXUFGmlxuwX"
     );
 }
 
