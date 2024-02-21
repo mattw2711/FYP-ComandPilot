@@ -1,4 +1,5 @@
 const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const config = {
   target: 'node',
@@ -30,11 +31,15 @@ const config = {
         test: /\.node$/,
         loader: "node-loader",
       },
-      {
-        test: /\.(txt)$/i,
-        loader: 'raw-loader',
-      }
     ]
-  }
+  },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/utils/resources/', to: 'resources' }, // copies all files from 'resources' to 'resources' in the output directory
+      ],
+    }),
+  ],
 };
+
 module.exports = config;

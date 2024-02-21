@@ -7,14 +7,9 @@ const openai = new OpenAI({apiKey: key});
 let assistant: OpenAI.Beta.Assistants.Assistant | null = null;
 
 export async function createBot() {
-    assistant = await openai.beta.assistants.create({
-        name: "Code generator",
-        instructions: `You are a helpful assistant to be used by novice programmers.
-        Only provide code, no explanation. 
-        All code should be in the form of a single text function in Java with no comments or explanation`,
-        tools: [{ type: "code_interpreter" }],
-        model: "gpt-4-turbo-preview"
-    });
+    assistant = await openai.beta.assistants.retrieve(
+        "asst_M8LhgFGO45Nx5UOp3brLbBzh"
+    );
 }
 
 export async function search(keyword: string): Promise<string > {
