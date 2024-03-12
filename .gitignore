@@ -16,3 +16,4 @@ vscode.d.ts
 /out
 .env
 src/utils/apiKey.ts
+.DS_Store
