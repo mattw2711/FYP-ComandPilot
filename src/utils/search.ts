@@ -10,6 +10,7 @@ export async function createBot() {
     assistant = await openai.beta.assistants.retrieve(
         "asst_bHUDDDCfHIIP2rXUFGmlxuwX"
     );
+    console.log(assistant);
 }
 
 export async function search(keyword: string): Promise<string > {
