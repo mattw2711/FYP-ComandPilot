@@ -101,11 +101,11 @@ export async function activate(_: vscode.ExtensionContext) {
                     const line = change.range.start.line;
                     const lineMaxColumn = e.document.lineAt(line).range.end.character;
                     const wholeLineRange = new vscode.Range(line, 0, line, lineMaxColumn);
-                    const deletedLineText = e.document.lineAt(line).text.trim();
+                    const deletedLineText = e.document.lineAt(line).text.trim();5
                     const edit = new vscode.WorkspaceEdit();
                     edit.delete(e.document.uri, wholeLineRange);
                     console.log("Deleted: ", deletedLineText);
-                    const index = chosenOptions.indexOf(deletedLineText.replace("//option lin", "").trim());
+                    const index = chosenOptions.indexOf(deletedLineText.split("//")[0].trim());
                     if (index !== -1) {
                         chosenOptions.splice(index, 1);
                     }
@@ -127,6 +127,7 @@ export async function activate(_: vscode.ExtensionContext) {
                 vscode.window.showInformationMessage('You chose the correct combination of options!');
             } else {
                 vscode.window.showInformationMessage('You did not choose the correct combination of options.');
+            }
 
                 const editor = vscode.window.activeTextEditor;
                 if (editor) {
